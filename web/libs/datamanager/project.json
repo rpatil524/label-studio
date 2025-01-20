@@ -14,7 +14,8 @@
         "tsConfig": "libs/datamanager/tsconfig.lib.json",
         "main": "libs/datamanager/src/index.js",
         "outputPath": "dist/libs/datamanager",
-        "isolatedConfig": true
+        "isolatedConfig": true,
+        "generatePackageJson": true
       },
       "configurations": {
         "development": {
@@ -32,13 +33,6 @@
         }
       }
     },
-    "lint": {
-      "executor": "@nx/linter:eslint",
-      "outputs": ["{options.outputFile}"],
-      "options": {
-        "lintFilePatterns": ["libs/datamanager/**/*.{ts,tsx,js,jsx}"]
-      }
-    },
     "unit": {
       "executor": "@nx/jest:jest",
       "outputs": ["{workspaceRoot}/coverage/{projectRoot}"],
@@ -51,6 +45,13 @@
           "ci": true,
           "codeCoverage": true
         }
+      }
+    },
+    "version": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "libs/datamanager",
+        "command": "node ../../tools/version/version.mjs"
       }
     }
   }

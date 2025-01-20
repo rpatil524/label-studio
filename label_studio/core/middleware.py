@@ -97,6 +97,14 @@ class CommonMiddlewareAppendSlashWithoutRedirect(CommonMiddleware):
 
         return response
 
+    def should_redirect_with_slash(self, request):
+        """
+        Override the original method to keep global APPEND_SLASH setting false
+        """
+        if not request.path_info.endswith('/'):
+            return True
+        return False
+
 
 class SetSessionUIDMiddleware(CommonMiddleware):
     def process_request(self, request):
@@ -157,6 +165,21 @@ class DatabaseIsLockedRetryMiddleware(CommonMiddleware):
             retries_number += 1
             sleep_time *= backoff
         return response
+
+
+class XApiKeySupportMiddleware:
+    """Middleware that adds support for the X-Api-Key header, by having its value supersede
+    anything that's set in the Authorization header."""
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        if 'HTTP_X_API_KEY' in request.META:
+            request.META['HTTP_AUTHORIZATION'] = f'Token {request.META["HTTP_X_API_KEY"]}'
+            del request.META['HTTP_X_API_KEY']
+
+        return self.get_response(request)
 
 
 class UpdateLastActivityMiddleware(CommonMiddleware):
